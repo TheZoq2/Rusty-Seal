@@ -3,6 +3,8 @@ extern crate nalgebra as na;
 use glium;
 use gl_structs::*;
 
+use sprite::*;
+
 const SPRITE_INDICES: [Vertex;4] = [
     Vertex{position: (0.0,0.0,1.0)}, 
     Vertex{position: (0.0,1.0,1.0)},
@@ -38,5 +40,11 @@ impl Drawer
             vertecies: vertecies,
             normals: normals,
         }
+    }
+
+
+    pub fn draw_sprite(sprite: Sprite) 
+    {
+
     }
 }

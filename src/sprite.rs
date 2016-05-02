@@ -7,6 +7,8 @@ pub struct Sprite
     position: na::Vector2<f32>,
     scale: na::Vector2<f32>,
     angle: f32,
+
+    depth: i32,
 }
 
 impl Sprite
@@ -19,6 +21,8 @@ impl Sprite
             position: na::zero(),
             scale: na::one(),
             angle: 0.0,
+
+            depth: 0,
         };
 
         result.update_transform();
@@ -70,6 +74,16 @@ impl Sprite
     pub fn get_angle(&self) -> f32
     {
         return self.angle;
+    }
+    
+    pub fn set_depth(&mut self, depth: i32)
+    {
+        self.depth = depth;
+    }
+    
+    pub fn get_depth(&self) -> i32
+    {
+        return self.depth;
     }
 }
 
