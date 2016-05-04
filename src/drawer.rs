@@ -1,7 +1,10 @@
 extern crate nalgebra as na;
  
 use glium;
+
+
 use gl_structs::*;
+use glium::texture::texture2d::*;
 
 use sprite::*;
 
@@ -45,6 +48,6 @@ impl Drawer
 
     pub fn draw_sprite(sprite: Sprite) 
     {
-
+        
     }
 }

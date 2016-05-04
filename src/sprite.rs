@@ -1,5 +1,8 @@
 extern crate nalgebra as na;
 
+use glium::texture::texture2d::*;
+use std::rc::*;
+
 pub struct Sprite 
 {
     transform: na::Matrix3<f32>,
@@ -9,11 +12,13 @@ pub struct Sprite
     angle: f32,
 
     depth: i32,
+
+    texture: Rc<Texture2d>,
 }
 
 impl Sprite
 {
-    pub fn new() -> Sprite 
+    pub fn new(texture: Texture2d) -> Sprite 
     {
         let mut result = Sprite 
         {
@@ -23,6 +28,8 @@ impl Sprite
             angle: 0.0,
 
             depth: 0,
+
+            texture: Rc::new(texture),
         };
 
         result.update_transform();
