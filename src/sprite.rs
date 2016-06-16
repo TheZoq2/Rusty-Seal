@@ -18,7 +18,7 @@ pub struct Sprite
 
 impl Sprite
 {
-    pub fn new(texture: Texture2d) -> Sprite 
+    pub fn new(texture: Rc<Texture2d>) -> Sprite 
     {
         let mut result = Sprite 
         {
@@ -29,7 +29,7 @@ impl Sprite
 
             depth: 0,
 
-            texture: Rc::new(texture),
+            texture: texture,
         };
 
         result.update_transform();
