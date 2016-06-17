@@ -92,6 +92,11 @@ impl Sprite
     {
         return self.depth;
     }
+
+    pub fn get_transform(&self) -> na::Matrix3<f32>
+    {
+        return self.transform;
+    }
 }
 
 #[cfg(test)]

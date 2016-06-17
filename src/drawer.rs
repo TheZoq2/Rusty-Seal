@@ -28,24 +28,37 @@ const SPRITE_INDICES: [u16; 4] = [
     3,
 ];
 
-pub struct Drawer
+pub struct Drawer<'a>
 {
     display: glium::Display,
     draw_surface: glium::Frame,
+
+    draw_params: glium::DrawParameters<'a>,
+    
+    //sprite_shader: glium::Program,
 
     vertecies: glium::VertexBuffer<Vertex>,
     normals: glium::VertexBuffer<Normal>,
     indices: glium::IndexBuffer<u16>,
 }
 
-impl Drawer
+impl<'a> Drawer<'a>
 {
-    pub fn new(display: glium::Display) -> Drawer 
+    pub fn new(display: glium::Display) -> Drawer<'a>
     {
         //Create vertecies before moving the display object into the struct
         let vertecies = glium::VertexBuffer::<Vertex>::new(&display, &SPRITE_VERTICES).unwrap();
         let normals = glium::VertexBuffer::<Normal>::new(&display, &SPRITE_NORMALS).unwrap();
         let indices = glium::IndexBuffer::new(&display, glium::index::PrimitiveType::TriangleStrip, &SPRITE_INDICES).unwrap();
+
+        let draw_params = glium::DrawParameters {
+            depth: glium::Depth {
+                test: glium::draw_parameters::DepthTest::IfLess,
+                write: true,
+                .. Default::default()
+            },
+            .. Default::default()
+        };
 
         let draw_surface = display.draw();
 
@@ -56,6 +69,8 @@ impl Drawer
             vertecies: vertecies,
             normals: normals,
             indices: indices,
+
+            draw_params: draw_params,
         }
     }
 
@@ -74,6 +89,11 @@ impl Drawer
 
     pub fn draw_sprite(&mut self, sprite: Sprite) 
     {
+        //Create the uniform for the sprite
+        let uniforms = uniform!{
+            //transform: sprite.get_transform(),
+        };
 
+        //self.target.draw((&self.vertices, &self.normals), &self.indices, &self.uniforms, &self.draw_params).unwrap();
     }
 }
