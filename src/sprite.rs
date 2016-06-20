@@ -1,5 +1,6 @@
 extern crate nalgebra as na;
 
+use glium;
 use glium::texture::texture2d::*;
 use std::rc::*;
 
@@ -14,11 +15,12 @@ pub struct Sprite
     depth: i32,
 
     texture: Rc<Texture2d>,
+    shader: Rc<glium::Program>,
 }
 
 impl Sprite
 {
-    pub fn new(texture: Rc<Texture2d>) -> Sprite 
+    pub fn new(texture: Rc<Texture2d>, shader: Rc<glium::Program>) -> Sprite 
     {
         let mut result = Sprite 
         {
@@ -30,6 +32,7 @@ impl Sprite
             depth: 0,
 
             texture: texture,
+            shader: shader,
         };
 
         result.update_transform();
@@ -96,6 +99,16 @@ impl Sprite
     pub fn get_transform(&self) -> na::Matrix3<f32>
     {
         return self.transform;
+    }
+
+    pub fn get_shader(&self) -> &glium::Program
+    {
+        return &self.shader;
+    }
+
+    pub fn get_texture(&self) -> &Texture2d
+    {
+        return &self.texture;
     }
 }
 

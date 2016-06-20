@@ -5,9 +5,13 @@ use glium::Surface;
 
 
 use gl_structs::*;
-use glium::texture::texture2d::*;
 
 use sprite::*;
+
+use std::error::Error;
+use std::io::prelude::*;
+use std::path::Path;
+use std::fs::File;
 
 const SPRITE_VERTICES: [Vertex;4] = [
     Vertex{position: (0.0,0.0,1.0)}, 
@@ -28,14 +32,44 @@ const SPRITE_INDICES: [u16; 4] = [
     3,
 ];
 
+
+
+//TODO: error handling
+pub fn load_whole_file(path: &String) -> String
+{
+    let file_path = Path::new(&path);
+
+    let mut file = match File::open(&file_path){
+        Err(why) => panic!("Failed to open file {}, {}", &path, Error::description(&why)),
+
+        Ok(open_file) => open_file
+    };
+
+    let mut result = String::new();
+    match file.read_to_string(&mut result) {
+        Err(why) => panic!("Failed to read content of file {}, {}", &path, Error::description(&why)),
+        Ok(a) => a
+    };
+
+    result
+}
+
+//TODO: Error handling
+//TODO: MOve somewhere else
+pub fn load_shader(display: &glium::Display, vert_path: &String, frag_path: &String) -> glium::Program 
+{
+    let vert_src = load_whole_file(vert_path);
+    let frag_src = load_whole_file(frag_path);
+
+    glium::Program::from_source(display, &vert_src, &frag_src, None).unwrap()
+}
+
 pub struct Drawer<'a>
 {
-    display: glium::Display,
+    display: &'a glium::Display,
     draw_surface: glium::Frame,
 
     draw_params: glium::DrawParameters<'a>,
-    
-    //sprite_shader: glium::Program,
 
     vertecies: glium::VertexBuffer<Vertex>,
     normals: glium::VertexBuffer<Normal>,
@@ -44,13 +78,14 @@ pub struct Drawer<'a>
 
 impl<'a> Drawer<'a>
 {
-    pub fn new(display: glium::Display) -> Drawer<'a>
+    pub fn new(display: &'a glium::Display) -> Drawer<'a>
     {
         //Create vertecies before moving the display object into the struct
-        let vertecies = glium::VertexBuffer::<Vertex>::new(&display, &SPRITE_VERTICES).unwrap();
-        let normals = glium::VertexBuffer::<Normal>::new(&display, &SPRITE_NORMALS).unwrap();
-        let indices = glium::IndexBuffer::new(&display, glium::index::PrimitiveType::TriangleStrip, &SPRITE_INDICES).unwrap();
+        let vertecies = glium::VertexBuffer::<Vertex>::new(display, &SPRITE_VERTICES).unwrap();
+        let normals = glium::VertexBuffer::<Normal>::new(display, &SPRITE_NORMALS).unwrap();
+        let indices = glium::IndexBuffer::new(display, glium::index::PrimitiveType::TriangleStrip, &SPRITE_INDICES).unwrap();
 
+        //Draw parameters for the rendering
         let draw_params = glium::DrawParameters {
             depth: glium::Depth {
                 test: glium::draw_parameters::DepthTest::IfLess,
@@ -60,6 +95,7 @@ impl<'a> Drawer<'a>
             .. Default::default()
         };
 
+        //Getting the surface to draw on
         let draw_surface = display.draw();
 
         Drawer {
@@ -82,7 +118,7 @@ impl<'a> Drawer<'a>
         self.draw_surface.clear_color_and_depth((0.0, 0.0, 0.0, 0.0), 1.0);
     }
     //Runs the finish function on the drawing surface and destroys this instance
-    pub fn finish(mut self)
+    pub fn finish(self)
     {
         self.draw_surface.finish().unwrap();
     }
@@ -91,9 +127,17 @@ impl<'a> Drawer<'a>
     {
         //Create the uniform for the sprite
         let uniforms = uniform!{
-            //transform: sprite.get_transform(),
+            transform: sprite.get_transform().as_ref().clone(),
+            texture: sprite.get_texture(),
         };
 
-        //self.target.draw((&self.vertices, &self.normals), &self.indices, &self.uniforms, &self.draw_params).unwrap();
+        
+        self.draw_surface.draw(
+                (&self.vertecies, &self.normals), 
+                &self.indices, 
+                sprite.get_shader(), 
+                &uniforms, 
+                &self.draw_params
+            ).unwrap();
     }
 }

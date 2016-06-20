@@ -6,3 +6,4 @@ authors = ["TheZoq2 <frans.skarman@gmail.com>"]
 [dependencies]
 glium = "*"
 nalgebra = "*"
+image = "*"
